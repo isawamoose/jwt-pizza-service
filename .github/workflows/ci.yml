@@ -61,7 +61,6 @@ jobs:
               apiKey: '${{ secrets.FACTORY_API_KEY }}',
             },
           };" > src/config.js
-          cat src/config.js
 
       - name: Tests
         run: npm test
@@ -85,13 +84,9 @@ jobs:
           cp Dockerfile dist
           cp -r src/* dist
           cp *.json dist
-          cat dist/config.js
-
           sed -i "s/root/${{ secrets.DB_USERNAME }}/g" dist/config.js
           sed -i "s/tempdbpassword/${{ secrets.DB_PASSWORD }}/g" dist/config.js
           sed -i "s/127.0.0.1/${{ secrets.DB_HOSTNAME }}/g" dist/config.js
-
-          cat dist/config.js
 
       - name: Create OIDC token to AWS
         uses: aws-actions/configure-aws-credentials@v4
