@@ -86,8 +86,8 @@ jobs:
           cp -r src/* dist
           cp *.json dist
           sed -i "s/root/${{ secrets.DB_USERNAME }}/g" dist/config.js
-          sed -i "s/tempdbpassword/${{ secrets.DB_PASSWORD }}/g" dist/config.js
-          sed -i "s/127.0.0.1/${{ secrets.DB_HOSTNAME }}/g" dist/config.js
+          sed -i "s/password/${{ secrets.DB_PASSWORD }}/g" dist/config.js
+          sed -i "s/host.docker.internal/${{ secrets.DB_HOSTNAME }}/g" dist/config.js
 
       - name: Create OIDC token to AWS
         uses: aws-actions/configure-aws-credentials@v4
