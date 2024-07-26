@@ -73,10 +73,7 @@ jobs:
           git add .
           git commit -m "generated"
           git push
-  deploy:
-    name: Deploy to AWS
-    runs-on: ubuntu-latest
-    steps:
+
       - name: Create dist
         run: |
           mkdir dist
