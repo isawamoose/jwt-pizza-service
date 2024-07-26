@@ -132,6 +132,6 @@ jobs:
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
         with:
           task-definition: ${{ steps.task-def.outputs.task-definition }}
-          service: jwt-pizza-service
+          service: jwt-pizza-service-stephen
           cluster: jwt-pizza-service
           wait-for-service-stability: false
