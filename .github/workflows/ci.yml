@@ -9,6 +9,9 @@ jobs:
   validate:
     name: Test and analyze
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+
     services:
       mysql:
         image: mysql:8.0.29
@@ -89,7 +92,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v4
         with:
           audience: sts.amazonaws.com
-          aws-region: us-east-2
+          aws-region: us-east-1
           role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT }}:role/${{ secrets.CI_IAM_ROLE }}
 
       - name: Login to Amazon ECR
