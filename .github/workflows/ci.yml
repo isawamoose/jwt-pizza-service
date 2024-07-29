@@ -126,12 +126,12 @@ jobs:
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
           task-definition: task-definition.json
-          container-name: jwt-pizza-service
+          container-name: jwt-pizza-service-stephen
           image: ${{ steps.build-image.outputs.image }}
       - name: Deploy new task definition
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
         with:
           task-definition: ${{ steps.task-def.outputs.task-definition }}
           service: jwt-pizza-service-stephen
-          cluster: jwt-pizza-service
+          cluster: jwt-pizza-service-stephen
           wait-for-service-stability: false
