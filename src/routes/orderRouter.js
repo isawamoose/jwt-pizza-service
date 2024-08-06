@@ -84,15 +84,24 @@ orderRouter.post(
     metrics.orderPlaced(order);
     const orderInfo = { diner: { id: req.user.id, name: req.user.name, email: req.user.email }, order };
     logger.factoryLogger(orderInfo);
+
+    const startTime = Date.now(); // Start the timer
+
     const r = await fetch(`${config.factory.url}/api/order`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', authorization: `Bearer ${config.factory.apiKey}` },
       body: JSON.stringify(orderInfo),
     });
+
+    const endTime = Date.now(); // Stop the timer
+    const creationLatency = (endTime - startTime) / 1000; // Calculate the latency in seconds
+
     const j = await r.json();
     if (r.ok) {
-      res.send({ order, jwt: j.jwt, reportUrl: j.reportUrl });
+      metrics.setCreationLatency(creationLatency);
+      res.send({ order, jwt: j.jwt, reportUrl: j.reportUrl, creationLatency });
     } else {
+      metrics.creationFailure();
       res.status(500).send({ message: 'Failed to fulfill order at factory', reportUrl: j.reportUrl });
     }
   })

@@ -17,6 +17,8 @@ class Metrics {
     this.authSuccesses = 0;
     this.authFailures = 0;
     this.revenue = 0;
+    this.creationFailures = 0;
+    this.creationLatency = 0;
 
     // This will periodically sent metrics to Grafana
     setInterval(() => {
@@ -32,6 +34,8 @@ class Metrics {
       this.sendMetricToGrafana('auth', 'all', 'success', this.authSuccesses);
       this.sendMetricToGrafana('auth', 'all', 'failure', this.authFailures);
       this.sendMetricToGrafana('order', 'all', 'revenue', this.revenue);
+      this.sendMetricToGrafana('order', 'all', 'failure', this.creationFailures);
+      this.sendMetricToGrafana('order', 'all', 'latency', this.creationLatency);
     }, 10000);
   }
 
@@ -91,6 +95,14 @@ class Metrics {
     for (const item of order.items) {
       this.revenue += item.price;
     }
+  }
+
+  creationFailure() {
+    this.creationFailures++;
+  }
+
+  setCreationLatency(latency) {
+    this.creationLatency = latency;
   }
 
   sendMetricToGrafana(metricPrefix, httpMethod, metricName, metricValue) {
