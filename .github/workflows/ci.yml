@@ -147,3 +147,6 @@ jobs:
           service: jwt-pizza-service-stephen
           cluster: jwt-pizza-service-stephen
           wait-for-service-stability: false
+      - name: Annotate deployment in Grafana
+        run: |
+          curl -s -X POST https://isawamoose.grafana.net/api/annotations -H "Authorization: Bearer ${{ secrets.GRAFANA_ACCESS_TOKEN }}" -H "Content-Type:application/json" -d '{"dashboardUID":"bdnsh7ukznv28f", "panelId":22, "text":"Version '"$version"' deployed" }'
