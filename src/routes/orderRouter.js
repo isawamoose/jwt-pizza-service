@@ -99,7 +99,7 @@ orderRouter.post(
     const j = await r.json();
     if (r.ok) {
       metrics.setCreationLatency(creationLatency);
-      res.send({ order, jwt: j.jwt, reportUrl: j.reportUrl, creationLatency });
+      res.send({ order, jwt: j.jwt, reportUrl: j.reportUrl });
     } else {
       metrics.creationFailure();
       res.status(500).send({ message: 'Failed to fulfill order at factory', reportUrl: j.reportUrl });
