@@ -23,7 +23,12 @@ class DB {
   async addMenuItem(item) {
     const connection = await this.getConnection();
     try {
-      const addResult = await this.query(connection, `INSERT INTO menu (title, description, image, price) VALUES (?, ?, ?, ?)`, [item.title, item.description, item.image, item.price]);
+      const addResult = await this.query(connection, `INSERT INTO menu (title, description, image, price) VALUES (?, ?, ?, ?)`, [
+        item.title,
+        item.description,
+        item.image,
+        item.price,
+      ]);
       return { ...item, id: addResult.insertId };
     } finally {
       connection.end();
@@ -35,7 +40,11 @@ class DB {
     try {
       user.password = await bcrypt.hash(user.password, 10);
 
-      const userResult = await this.query(connection, `INSERT INTO user (name, email, password) VALUES (?, ?, ?)`, [user.name, user.email, user.password]);
+      const userResult = await this.query(connection, `INSERT INTO user (name, email, password) VALUES (?, ?, ?)`, [
+        user.name,
+        user.email,
+        user.password,
+      ]);
       const userId = userResult.insertId;
       for (const role of user.roles) {
         switch (role.role) {
@@ -79,17 +88,20 @@ class DB {
   async updateUser(userId, email, password) {
     const connection = await this.getConnection();
     try {
-      const params = [];
+      const updateParams = [];
+      const updateValues = [];
       if (password) {
         const hashedPassword = await bcrypt.hash(password, 10);
-        params.push(`password='${hashedPassword}'`);
+        updateParams.push('password=?');
+        updateValues.push(hashedPassword);
       }
       if (email) {
-        params.push(`email='${email}'`);
+        updateParams.push('email=?');
+        updateValues.push(email);
       }
-      if (params.length > 0) {
-        const query = `UPDATE user SET ${params.join(', ')} WHERE id=${userId}`;
-        await this.query(connection, query);
+      if (updateParams.length > 0) {
+        const updateQuery = `UPDATE user SET ${updateParams.join(', ')} WHERE id=${userId}`;
+        await this.query(connection, updateQuery, updateValues);
       }
       return this.getUser(email, password);
     } finally {
@@ -132,7 +144,11 @@ class DB {
     const connection = await this.getConnection();
     try {
       const offset = this.getOffset(page, config.db.listPerPage);
-      const orders = await this.query(connection, `SELECT id, franchiseId, storeId, date FROM dinerOrder WHERE dinerId=? LIMIT ${offset},${config.db.listPerPage}`, [user.id]);
+      const orders = await this.query(
+        connection,
+        `SELECT id, franchiseId, storeId, date FROM dinerOrder WHERE dinerId=? LIMIT ${offset},${config.db.listPerPage}`,
+        [user.id]
+      );
       for (const order of orders) {
         let items = await this.query(connection, `SELECT id, menuId, description, price FROM orderItem WHERE orderId=?`, [order.id]);
         order.items = items;
@@ -146,11 +162,20 @@ class DB {
   async addDinerOrder(user, order) {
     const connection = await this.getConnection();
     try {
-      const orderResult = await this.query(connection, `INSERT INTO dinerOrder (dinerId, franchiseId, storeId, date) VALUES (?, ?, ?, now())`, [user.id, order.franchiseId, order.storeId]);
+      const orderResult = await this.query(connection, `INSERT INTO dinerOrder (dinerId, franchiseId, storeId, date) VALUES (?, ?, ?, now())`, [
+        user.id,
+        order.franchiseId,
+        order.storeId,
+      ]);
       const orderId = orderResult.insertId;
       for (const item of order.items) {
         const menuId = await this.getID(connection, 'id', item.menuId, 'menu');
-        await this.query(connection, `INSERT INTO orderItem (orderId, menuId, description, price) VALUES (?, ?, ?, ?)`, [orderId, menuId, item.description, item.price]);
+        await this.query(connection, `INSERT INTO orderItem (orderId, menuId, description, price) VALUES (?, ?, ?, ?)`, [
+          orderId,
+          menuId,
+          item.description,
+          item.price,
+        ]);
       }
       return { ...order, id: orderId };
     } finally {
@@ -240,7 +265,11 @@ class DB {
   async getFranchise(franchise) {
     const connection = await this.getConnection();
     try {
-      franchise.admins = await this.query(connection, `SELECT u.id, u.name, u.email FROM userRole AS ur JOIN user AS u ON u.id=ur.userId WHERE ur.objectId=? AND ur.role='franchisee'`, [franchise.id]);
+      franchise.admins = await this.query(
+        connection,
+        `SELECT u.id, u.name, u.email FROM userRole AS ur JOIN user AS u ON u.id=ur.userId WHERE ur.objectId=? AND ur.role='franchisee'`,
+        [franchise.id]
+      );
 
       franchise.stores = await this.query(
         connection,
@@ -346,7 +375,9 @@ class DB {
   }
 
   async checkDatabaseExists(connection) {
-    const [rows] = await connection.execute(`SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = ?`, [config.db.connection.database]);
+    const [rows] = await connection.execute(`SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = ?`, [
+      config.db.connection.database,
+    ]);
     return rows.length > 0;
   }
 }
